@@ -1,0 +1,183 @@
+---
+title: "Assignment 5"
+format: html
+editor: visual
+self-contained: true
+execute: 
+  warning: false
+  echo: false
+---
+
+GitHub Repo Link: https://github.com/achaparala20/Assignment5
+
+```{r}
+library("tidycensus")
+```
+
+```{r Data Loading and Cleaning}
+#load packages
+library(sf)
+library(tidyverse)
+library(readr)
+library(stringr)
+library(here) 
+
+#load csv file and correct data types
+crimes <- read_csv("data/crimes-reduced.csv", col_types = cols(
+  Latitude = col_character(),
+  Longitude = col_character()
+))
+
+#correct for white space and lowercase
+names(crimes) <- names(crimes) %>%
+  str_to_lower() %>%
+  str_replace(" ", "_")
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+```{r Filtering Data}
+
+library(lubridate)
+
+#filter to homicides with valid lat/lon in the last ten years
+crimes %>%
+  filter(!is.na(latitude)) %>%
+  filter(!is.na(longitude)) %>%
+  mutate(date = mdy_hms(date)) %>%
+  filter(date >= (today() - years(10))) %>%
+  filter(primary_type == "HOMICIDE")
+  
+```
+
+```{r Convert Lon/Lat to Points Geometry}
+library(sf)
+library(ggplot2)
+#replace crimes with filtered version from Exercise 2
+crimes <- crimes %>%
+  filter(!is.na(latitude)) %>%
+  filter(!is.na(longitude)) %>%
+  mutate(date = mdy_hms(date)) %>%
+  filter(date >= (today() - years(10))) %>%
+  filter(primary_type == "HOMICIDE") 
+
+#convert lat/lon columns to point data
+crimes_sf <- st_as_sf(crimes, coords = c("longitude", "latitude"), remove = FALSE) %>%
+  st_set_crs(value = 4326) 
+
+#graph arrests
+ggplot(data = crimes_sf) + 
+  geom_sf(
+    mapping = aes(color = arrest)
+  )
+    
+  
+
+```
+
+```{r Load Census Tracts, Perform a Spatial Join, and Create Choropleth}
+
+#load chicago data
+unzip(
+  zipfile = here("data/Boundaries - Census Tracts - 2010", 
+                 "geo_export_12a6b990-3b3c-4a35-94bd-9a8272a08360.shp"), 
+  exdir = here("data/Boundaries - Census Tracts - 2010")
+)
+chicago <- st_read(
+  here("data/Boundaries - Census Tracts - 2010", 
+       "geo_export_12a6b990-3b3c-4a35-94bd-9a8272a08360.shp") 
+  ) %>%
+  select(geoid10) %>%
+  st_transform(chicago, crs = 4326)
+
+#spatial join
+chicago_crimes <- st_join(chicago, crimes_sf, join = st_contains)
+
+#calculate homicide rate and arrest rate by CENSUS tract
+chicago_merged_agg <- chicago_crimes %>%
+   group_by(geoid10) %>%
+  summarize(homicide_count = n()) %>%
+  mutate(arrest_rate = (sum(arrest=TRUE) / homicide_count))
+
+#join census tract geometry 
+ chicago_merged_agg_census <- st_join(chicago_merged_agg, chicago, join = st_covered_by)
+ 
+ #create chloropleths
+ chicago_merged_agg_census %>%
+  ggplot() +
+  geom_sf(aes(fill = homicide_count), color = "white", size = 0.1) +
+  scale_fill_gradient() +
+  theme_void() +
+  labs(
+    title = "Chicago Homicide Incidence",
+    caption = "City of Chicago Open Data Portal",
+    fill = "Count"
+  )
+ 
+  chicago_merged_agg_census %>%
+  ggplot() +
+  geom_sf(aes(fill = arrest_rate), color = "white", size = 0.1) +
+  scale_fill_gradient() +
+  theme_void() +
+  labs(
+    title = "Chicago Homicide Arrest Rate",
+    caption = "City of Chicago Open Data Portal",
+    fill = "Arrest Rate"
+  )
+  
+```
+
+```{r Using the Census API}
+
+library(tidycensus)
+census_api_key("
+               ", install = TRUE, 
+               overwrite = TRUE)
+
+
+#using tidycensus  
+
+#view data
+acs19 <- load_variables(2019, "acs5") %>%
+  filter(geography == "tract")
+
+#filter to desired variables
+acs19_filtered <- get_acs(geography = "tract", 
+                       variables = c("B19019_001","B06009_005", "B17001_002"),
+                       state = "IL",
+                       county = "Cook County",
+                       year = 2019,
+                       output = "wide",
+                       sumfile = "acs5")  
+#using census API
+library(tidyverse)
+library(httr)
+library(jsonlite)
+
+url <- "api.census.gov/data/2019/acs/acs5?get=NAME,B19019_001E,B06009_005E,B17001_002E&for=tract&in=county:031&in=state:17&key=89e6c659c4449b164393b5397bf66acbcd7a7589"
+
+pop_json <- GET(url = url)
+http_status(pop_json)
+
+# get the contents of the response as a text string
+pop_json <- content(pop_json, as = "text")
+
+# create a character matrix from the JSON
+pop_matrix <- fromJSON(pop_json)
+
+# turn the body of the character matrix into a tibble
+pop_data <- as_tibble(pop_matrix[2:nrow(pop_matrix), ],
+                      .name_repair = "minimal")
+# add variable names to the tibble
+names(pop_data) <- pop_matrix[1, ]
+
+pop_data
+ 
+library(testthat)
+ 
+test_that("same number of rows", expect_equal (nrow(acs19_filtered),nrow(pop_data)))
+
+```
+
+```         
+```
