@@ -1,11 +1,22 @@
-"0","#import secc rural dataset
-secc_rural <- read_csv(""secc_cons_rural_shrid.csv"")
-"
-"2","[1mRows: [22m[34m545905[39m [1mColumns: [22m[34m9[39m"
-"2","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[39m
+"0","knitr::opts_chunk$set(echo = TRUE)"
+"0",""
+"0","#import secc urban dataset "
+"0","secc_urban <- read_csv(""secc_cons_urban_shrid.csv"")"
+"2","[1mRows: [22m[34m3636[39m [1mColumns: [22m[34m9[39m"
+"2","[36m──[39m [1mColumn specification[22m [36m─────────────────────────────────────────────────────────────────────────────────────────────[39m
 [1mDelimiter:[22m "",""
 [31mchr[39m (1): shrid2
-[32mdbl[39m (8): secc_cons_rural, secc_cons_pc_rural, secc_pov_rate_rural, secc_pov_rate_tend_rural, _mean_p_miss, _core_p_miss, _target_weight_share, _target_..."
+[32mdbl[39m (8): secc_cons_urban, secc_cons_pc_urban, secc_pov_rate_urban, secc_pov_rate_tend_urban, _mean_p_miss, _core_..."
+"2","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."
+"0","#import secc rural dataset"
+"0","secc_rural <- read_csv(""secc_cons_rural_shrid.csv"")"
+"2","[1mRows: [22m[34m545905[39m [1mColumns: [22m[34m9[39m"
+"2","[36m──[39m [1mColumn specification[22m [36m─────────────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m (1): shrid2
+[32mdbl[39m (8): secc_cons_rural, secc_cons_pc_rural, secc_pov_rate_rural, secc_pov_rate_tend_rural, _mean_p_miss, _core_..."
 "2","
 [36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
 [36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."

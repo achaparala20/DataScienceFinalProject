@@ -4,10 +4,17 @@ output: html_document
 date: "2023-11-13"
 ---
 
+# Install and Load Packages
+```{r}
+library(readr)
+library(dplyr)
+
+```
+
+
 # Importing Data
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(readr)
 
 #import secc urban dataset 
 secc_urban <- read_csv("secc_cons_urban_shrid.csv")
@@ -15,25 +22,17 @@ secc_urban <- read_csv("secc_cons_urban_shrid.csv")
 #import secc rural dataset
 secc_rural <- read_csv("secc_cons_rural_shrid.csv")
 
-
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Merging Data
+```{r}
 
-```{r cars}
-summary(cars)
+#secc urban and rural data-frames have different names, so can't do a vertical join. need to create a new dataframe with new column names, with an additional column to indicate urban/rural
+
+
+
+
+
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

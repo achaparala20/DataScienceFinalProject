@@ -1,0 +1,5 @@
+"0","#merge secc urban and rural data-frames
+secc_total <- merge(secc_rural, secc_urban, by = ""rows"")
+"
+"2","Error in fix.by(by.x, x) : 'by' must specify a uniquely valid column
+"
