@@ -25,6 +25,44 @@ secc_rural <- read_csv("secc_cons_rural_shrid.csv")
 ```
 
 
+```{r}
+
+library(ggplot2)
+rural_shrid_caste <- read_csv("/Users/Juj/Downloads/shrug-secc-mord-rural-csv (1)/secc_rural_shrid.csv")
+
+rural_consumption <- read_csv("/Users/Juj/Downloads/secc_cons_rural_shrid.csv")
+                              
+rural_merged <-  merge(rural_consumption, rural_shrid_caste, by = 'shrid2', all = FALSE)
+
+urban_shrid_caste <- read_csv("/Users/Juj/Downloads/shrug-secc-parsed-urban-csv/secc_urban_shrid.csv")
+
+urban_consumption <- read_csv("/Users/Juj/Downloads/secc_cons_urban_shrid.csv")
+                              
+urban_merged <-  merge(urban_consumption, urban_shrid_caste, by = 'shrid2', all = FALSE)
+
+
+
+rural_merged %>%
+  ggplot(mapping = aes(x = sc_share, y = secc_cons_pc_rural)) +
+  geom_point(position = "jitter", alpha = .3) +
+  geom_smooth() +
+  scale_y_continuous(limits = c(NA, 150000)) +
+  labs(x = "Share of Scheduled Caste Population in Rural Areas",
+       y = "Per Capita Monthly Consumption") +
+  theme_minimal()
+
+urban_merged %>%
+  ggplot(mapping = aes(x = sc_share, y = secc_cons_pc_urban)) +
+  geom_point(position = "jitter", alpha = .3) +
+  geom_smooth() +
+  scale_y_continuous(limits = c(NA, 80000)) +
+  labs(x = "Share of Scheduled Caste Population in Urban Areas",
+       y = "Per Capita Monthly Consumption") +
+  theme_minimal()
+
+
+
+```
 
 # Merging Data
 ```{r}
